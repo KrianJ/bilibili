@@ -1,0 +1,47 @@
+# 备注
+## 起始url
+    base: https://www.bilibili.com/video/BV11E411k76T?p=2
+    query_string: bvid; p
+
+## 视频数据信息：
+    url: https://api.bilibili.com/x/web-interface/archive/stat?aid=71816014
+    main_response:
+        aid: av号
+        bvid: bv号
+        coin: 投币
+        danmaku: 弹幕数
+        favorite: 收藏
+        like: 点赞
+        reply: 评论
+        share: 分享
+        view: 观看
+
+## 多p视频:
+    子p列表(单p则只有一个元素)：
+        url： https://api.bilibili.com/x/player/pagelist?bvid={0}&jsonp=jsonp
+        query_string：bvid = 'BV11E411k76T'
+        main_response("data" in json file)：
+            cid(cid);
+            duration(时长);
+            part(子p名称)
+
+    注：oid = cid
+## 弹幕日期：
+    url: https://api.bilibili.com/x/v2/dm/history/index?type=1&oid=124606776&month=2020-08
+    query_string: type, oid, month
+    main_response: data of date
+
+## 历史弹幕：
+    url: https://api.bilibili.com/x/v2/dm/history?type=1&oid=124606776&date=2020-08-12
+    query_string: oid, date
+    response: xml file of danmu
+
+# 思路
+1. 获取cid列表
+    根据视频列表请求判断视频为单p还是多p(data长度)，多p需要遍历抓取
+    获取每p的cid
+2. 获取弹幕日期列表(需要登陆才可以获取历史弹幕日期，这里需要加入cookie)
+    从发布时间开始遍历至当前日期，获取所有有弹幕产生的日期
+    得到该视频下所有日期
+3. 根据cid和日期生成弹幕请求url
+    根据生成的url下载弹幕文件(xml)
